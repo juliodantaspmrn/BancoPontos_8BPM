@@ -217,7 +217,20 @@ async function buscarNome(valor, destino) {
 /* LANÇAR PONTOS */
 async function cadastrarPonto() {
 
-  if (!pontMat.value) return alert("Informe a(s) matrícula(s)");
+  if (!pontMat.value) {
+    alert("Informe a(s) matrícula(s)");
+    return;
+  }
+
+  if (!pontProc.value || !pontInfo.value) {
+    alert("Informe o Nº do procedimento e a observação");
+    return;
+  }
+
+  if (!pontData.value || !pontHora.value) {
+    alert("Informe data e horário");
+    return;
+  }
 
   const matriculas = pontMat.value
     .split(",")
@@ -231,18 +244,18 @@ async function cadastrarPonto() {
 
   const pontos = pontTipo.value === "APF" ? 5 : 10;
 
-  // 1️⃣ Buscar todos os policiais informados
-  const { data: usuarios } = await supabaseClient
+  /* 1️⃣ Verifica se todas as matrículas existem */
+  const { data: usuarios, error: erroUser } = await supabaseClient
     .from("usuarios")
     .select("matricula")
     .in("matricula", matriculas);
 
-  if (!usuarios || usuarios.length !== matriculas.length) {
+  if (erroUser || !usuarios || usuarios.length !== matriculas.length) {
     alert("Uma ou mais matrículas não estão cadastradas");
     return;
   }
 
-  // 2️⃣ Monta os lançamentos (um por policial)
+  /* 2️⃣ Monta os lançamentos */
   const registros = matriculas.map(mat => ({
     matricula: mat,
     tipo: pontTipo.value,
@@ -253,19 +266,20 @@ async function cadastrarPonto() {
     info_adicional: pontInfo.value
   }));
 
-  // 3️⃣ Insere tudo de uma vez
+  /* 3️⃣ Insere */
   const { error } = await supabaseClient
     .from("pontuacoes")
     .insert(registros);
 
   if (error) {
-    alert("Erro ao lançar pontuação");
+    console.error(error);
+    alert(error.message);
     return;
   }
 
   alert(`Pontuação lançada para ${matriculas.length} policial(is)`);
 
-  // 4️⃣ Limpa campos
+  /* 4️⃣ Limpa campos */
   pontMat.value = "";
   pontData.value = "";
   pontHora.value = "";
@@ -273,6 +287,7 @@ async function cadastrarPonto() {
   pontInfo.value = "";
   $("nomePolicial").innerHTML = "";
 }
+
 
 
 /* COMPENSAÇÃO */
@@ -902,6 +917,7 @@ carregarDashboard();
 
 
   
+
 
 
 

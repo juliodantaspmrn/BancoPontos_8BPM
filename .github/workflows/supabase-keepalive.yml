@@ -1,16 +1,17 @@
-name: Supabase Keep Alive
+name: Supabase Keepalive 8BPM
 
 on:
   schedule:
-    - cron: "0 12 * * *"   # todo dia às 12h (UTC)
+    - cron: "0 */12 * * *"
   workflow_dispatch:
 
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Supabase keepalive
+      - name: Call Supabase RPC
         run: |
-          curl -X GET "https://sbdrryiqvtaxuwcccvwj.supabase.co/rest/v1/keepalive?select=id&limit=1" \
-          -H "apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNiZHJyeWlxdnRheHV3Y2NjdndqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgyMzU5NjcsImV4cCI6MjA4MzgxMTk2N30.Swd8O3bZnAzJsbSea9606oOa0GhYYNU0U-pC_iYINCQ" \
-          -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNiZHJyeWlxdnRheHV3Y2NjdndqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgyMzU5NjcsImV4cCI6MjA4MzgxMTk2N30.Swd8O3bZnAzJsbSea9606oOa0GhYYNU0U-pC_iYINCQ"
+          curl -X POST "https://sbdrryiqvtaxuwcccvwj.supabase.co/rest/v1/rpc/keepalive" \
+          -H "apikey: ${{ secrets.SUPABASE_8BPM_ANON_KEY }}" \
+          -H "Content-Type: application/json" \
+          -d "{}"
